@@ -181,6 +181,50 @@ int outstideHome(Point board[], char player,  int *hitW, int *hitB) {
     return 0;
 }
 
+int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
+    int possibleMoves = 0;
+    int i = 0;
+    if (player == 'A') {
+        if (hitW) {
+            if (checkLegalMove(board, 0, 24 - dices[0] + 1, player, dices, &hitW, &hitB)) {
+                return 1;
+            }
+            if (checkLegalMove(board, 0, 24 - dices[1] + 1, player, dices, &hitW, &hitB)) {
+                return 1;
+            }
+        }
+        for (i = 1; i <= 24; i++) {
+            if (board[i].color == 'A') {
+                if (checkLegalMove(board, i, i - dices[0], player, dices, &hitW, &hitB)) {
+                    return 1;
+                }
+                if (checkLegalMove(board, i, i - dices[1], player, dices, &hitW, &hitB)) {
+                    return 1;
+                }
+            }
+        }
+    } else {
+        if (hitB) {
+            if (checkLegalMove(board, 0, dices[0], player, dices, &hitW, &hitB)) {
+                return 1;
+            }
+            if (checkLegalMove(board, 0, dices[1], player, dices, &hitW, &hitB)) {
+                return 1;
+            }
+        }
+        for (i = 1; i <= 24; i++) {
+            if (board[i].color == 'N') {
+                if (checkLegalMove(board, i, i + dices[0], player, dices, &hitW, &hitB)) {
+                    return 1;
+                }
+                if (checkLegalMove(board, i, i + dices[1], player, dices, &hitW, &hitB)) {
+                    return 1;
+                }
+            }
+        }
+    }
+}
+
 int checkLegalMove (Point board[], int src, int dest, char player, int dices[2], int *hitW, int *hitB) {
     if(src == 0) {
         //verifica daca jucatorul pune in casa corect daca are o piesa scoasa
@@ -357,11 +401,16 @@ int main() {
         scanf("%c", &key);
         diceRoll(&moves, dices);
         printf("You rolled: %d %d\n", dices[0], dices[1]);
+        if (!anyMoves(board, player, dices, hitW, hitB)) {
+            printf("No legal moves available.");
+            moves = 0;
+        }
         while (moves) {
             maxTop = getMaxTop(board);
             maxBottom = getMaxBottom(board);
             printBoard(board, maxTop, maxBottom, hitW, hitB);
             printf("Moves remaining : %d\n", moves);
+            
             printf("Input move (source destination) :\n");
             scanf("%d%d", &src, &dest);
             if (checkLegalMove(board, src, dest, player, dices, &hitW, &hitB)) {
