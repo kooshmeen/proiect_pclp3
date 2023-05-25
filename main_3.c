@@ -78,6 +78,13 @@ void printBoard(Point tabla[], int maxTop, int maxBottom, int hitW, int hitB) {
 }
 
 void makeMove (Point board[], int src, int dest, char player, int dices[2], int *hitW, int *hitB) {
+    if (dices[0] && dices[1] && dices[0] != dices[1]) { // 2 zaruri diferite, folosim 1, il scoatem
+        if (abs(src - dest) == dices[0]) { // daca sunt zaruri identice nu cont ptc deja e limitat de moves
+            dices[0] = 0;
+        } else {
+            dices[1] = 0;
+        }
+    }
     if(src == 0) {
         if(player == 'A' && hitW != 0) {
             *hitW = *hitW - 1;
@@ -225,19 +232,26 @@ int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
     }
 }
 
-int checkLegalMove (Point board[], int src, int dest, char player, int dices[2], int *hitW, int *hitB) {
+int checkLegalMove (Point board[], int src, int dest, char player, int dices[2], int hitW, int hitB) {
     if(src == 0) {
         //verifica daca jucatorul pune in casa corect daca are o piesa scoasa
 
         if(player == 'A') {
-            if(*hitW == 0)
+            if(hitW == 0)
                 return 0;
             else {
+                if (25 - dest != dices[0] && 25 - dest != dices[1]) { // muta altfel de cat zice zarul
+                    return 0;
+                }
                 if(dest < 19 || dest > 24)
                     return 0;
                 if(board[dest].color != player && board[dest].size > 1)
                     return 0;
                 //trebuie verificat daca a bagat corect negru
+                /*
+
+                cred ca e deja verificat ca baga in casa si ca nu baga peste 2 negre si ca baga cat trebuie
+
                 int sase_casa_negru = 19;
                 int ok = 0;
                 int pozitie_casa_negru;
@@ -245,17 +259,22 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
                     //de modificat aici
                 }
                 //aici trebuie check any possible moves
+                */
             }
             return 1;
         }
         else {
-            if(*hitB == 0)
+            if(hitB == 0)
                 return 0;
             else {
+                if (dices[0] != dest && dices[1] != dest) {
+                    return 0;
+                }
                 if(dest > 6 || dest < 1)
                     return 0;
                 if(board[dest].color != player && board[dest].size > 1)
                     return 0;
+                /*
                 int ok = 0;
                 for(int i = 0; i <= 1; i++) {
                     if(dest == dices[i])
@@ -264,6 +283,7 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
                 if(ok == 0)
                     return 0;
                 //aici trebuie check any possible moves
+                */
             }
             return 1;
         }
@@ -274,12 +294,12 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
         }
         //modificat aici, de verificat
         if (player == 'A') {
-            if (src + dices[0] == 25 || src + dices[1] == 25) {
+            if (src + dices[0] >= 25 || src + dices[1] >= 25) {
                 return 1;
             }
             return 0;
         } else {
-            if (src - dices[0] == 0 || src - dices[1] == 0) {
+            if (src - dices[0] <= 0 || src - dices[1] <= 0) {
                 return 1;
             }
             return 0;
@@ -296,7 +316,7 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
         if (board[src].size == 0) {
             return 0;
         }
-        if (*hitW) {
+        if (hitW) {
             if (dest < 19) {
                 return 0;
             }
@@ -312,7 +332,7 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
         if (board[src].size == 0) {
             return 0;
         }
-        if (*hitB) {
+        if (hitB) {
             if (dest > 6) {
                 return 0;
             }
