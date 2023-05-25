@@ -272,7 +272,18 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
         if (outstideHome(board, player, hitW, hitB)) {
             return 0;
         }
-        return 1; //modificat aici, de verificat
+        //modificat aici, de verificat
+        if (player == 'A') {
+            if (src + dices[0] == 25 || src + dices[1] == 25) {
+                return 1;
+            }
+            return 0;
+        } else {
+            if (src - dices[0] == 0 || src - dices[1] == 0) {
+                return 1;
+            }
+            return 0;
+        }
     }
     if (src < 1 || src > 24 || dest < 1 || dest > 24) {
         return 0;
