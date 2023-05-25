@@ -31,7 +31,6 @@ void initializeBoard(Point board[]) {
     board[24].color = 'A';
     board[1].size = 2;
     board[1].color = 'N';
-
 }
 
 void printBoard(Point tabla[], int maxTop, int maxBottom, int hitW, int hitB) {
@@ -78,12 +77,16 @@ void printBoard(Point tabla[], int maxTop, int maxBottom, int hitW, int hitB) {
 }
 
 void makeMove (Point board[], int src, int dest, char player, int dices[2], int *hitW, int *hitB) {
-    if (dices[0] && dices[1] && dices[0] != dices[1]) { // 2 zaruri diferite, folosim 1, il scoatem
+    if ((dices[0] != 0) && (dices[1] != 0)  && (dices[0] != dices[1])) { // 2 zaruri diferite, folosim 1, il scoatem
         if (abs(src - dest) == dices[0]) { // daca sunt zaruri identice nu cont ptc deja e limitat de moves
             dices[0] = 0;
         } else {
             dices[1] = 0;
         }
+    }
+    if(src == -1 && dest == -1) {
+        printf("YOU SKIPPED THIS TURN\n");
+        return;
     }
     if(src == 0) {
         if(player == 'A' && hitW != 0) {
@@ -189,6 +192,8 @@ int outstideHome(Point board[], char player,  int hitW, int hitB) {
 }
 
 int checkLegalMove (Point board[], int src, int dest, char player, int dices[2], int hitW, int hitB) {
+    if(src == -1 && dest == -1)
+        return 1;
     if(src == 0) {
         //verifica daca jucatorul pune in casa corect daca are o piesa scoasa
 
@@ -196,7 +201,7 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
             if(hitW == 0)
                 return 0;
             else {
-                if (25 - dest != dices[0] && 25 - dest != dices[1]) { // muta altfel de cat zice zarul
+                if (((25 - dest) != dices[0]) && ((25 - dest) != dices[1])) { // muta altfel de cat zice zarul
                     return 0;
                 }
                 if(dest < 19 || dest > 24)
@@ -250,12 +255,12 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
         }
         //modificat aici, de verificat
         if (player == 'A') {
-            if (src + dices[0] >= 25 || src + dices[1] >= 25) {
+            if (src - dices[0] <= 0 || src - dices[1] <= 0) {
                 return 1;
             }
             return 0;
         } else {
-            if (src - dices[0] <= 0 || src - dices[1] <= 0) {
+            if (src + dices[0] >= 25 || src + dices[1] >= 25) {
                 return 1;
             }
             return 0;
@@ -303,7 +308,7 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
     return 1;
 }
 
-int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
+/*int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
     int possibleMoves = 0;
     int i = 0;
     if (player == 'A') {
@@ -346,7 +351,7 @@ int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
         }
     }
     return 0;
-}
+}*/
 
 void diceRoll (int *moves, int dices[2]) {
     dices[0] = (rand() % 6) + 1;
@@ -359,11 +364,11 @@ void diceRoll (int *moves, int dices[2]) {
 
 int checkGameEnd (Point board[]) {
     int blackCount = 0, whiteCount = 0;
-    for (int i = 0; i < NUM_POINTS; i++) {
-        if (board[i].color == 'N') {
+    for (int i = 1; i <= NUM_POINTS; i++) {
+        if (board[i].color == 'N' && board[i].size > 0) {
             blackCount += board[i].size;
         }
-        if (board[i].color == 'A') {
+        if (board[i].color == 'A' && board[i].size > 0) {
             whiteCount += board[i].size;
         }
     }
@@ -421,7 +426,7 @@ int main() {
                 scanf("%d", &wager);
             } while (wager < 10 && wager <= playerBPoints && wager <= playerWPoints);
         }
-        
+
         while (dices[0] == dices[1]) {
             printf ("Dice roll (press Enter) :\n");
             scanf ("%c", &key);
@@ -448,16 +453,16 @@ int main() {
             scanf("%c", &key);
             diceRoll(&moves, dices);
             printf("You rolled: %d %d\n", dices[0], dices[1]);
-            if (!anyMoves(board, player, dices, hitW, hitB)) {
+            /*if (!anyMoves(board, player, dices, hitW, hitB)) {
                 printf("No legal moves available.");
                 moves = 0;
-            }
+            }*/
             while (moves) {
                 maxTop = getMaxTop(board);
                 maxBottom = getMaxBottom(board);
                 printBoard(board, maxTop, maxBottom, hitW, hitB);
                 printf("Moves remaining : %d\n", moves);
-                
+
                 printf("Input move (source destination) :\n");
                 scanf("%d%d", &src, &dest);
                 if (checkLegalMove(board, src, dest, player, dices, hitW, hitB)) {
