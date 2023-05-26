@@ -8,6 +8,7 @@ typedef struct {
 } Point;
 
 #define NUM_POINTS 24
+#define START_SCORE 500
 
 void initializeBoard(Point board[]) {
     int i = 0;
@@ -45,7 +46,7 @@ void printBoard(Point tabla[], int maxTop, int maxBottom, int hitW, int hitB) {
             }
         }
         printf("      ");
-        for (j = 19; j <= 24; j++) {
+        for (j = 19; j <= NUM_POINTS; j++) {
             if (tabla[j].size - i > 0) {
                 printf(" %c ", tabla[j].color);
             } else {
@@ -172,7 +173,7 @@ int outstideHome(Point board[], char player,  int hitW, int hitB) {
         if (hitW) {
             return 1;
         }
-        for (int i = 7; i <= 24; i++) {
+        for (int i = 7; i <= NUM_POINTS; i++) {
             if (board[i].size && board[i].color == 'A') {
                 return 1;
             }
@@ -194,6 +195,9 @@ int outstideHome(Point board[], char player,  int hitW, int hitB) {
 int checkLegalMove (Point board[], int src, int dest, char player, int dices[2], int hitW, int hitB) {
     if(src == -1 && dest == -1)
         return 1;
+    if (src == dest) {
+        return 0;
+    }
     if(src == 0) {
         //verifica daca jucatorul pune in casa corect daca are o piesa scoasa
 
@@ -201,10 +205,10 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
             if(hitW == 0)
                 return 0;
             else {
-                if (((25 - dest) != dices[0]) && ((25 - dest) != dices[1])) { // muta altfel de cat zice zarul
+                if (((NUM_POINTS + 1 - dest) != dices[0]) && ((NUM_POINTS + 1 - dest) != dices[1])) { // muta altfel de cat zice zarul
                     return 0;
                 }
-                if(dest < 19 || dest > 24)
+                if(dest < 19 || dest > NUM_POINTS)
                     return 0;
                 if(board[dest].color != player && board[dest].size > 1)
                     return 0;
@@ -266,7 +270,7 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
             return 0;
         }
     }
-    if (src < 1 || src > 24 || dest < 1 || dest > 24) {
+    if (src < 1 || src > NUM_POINTS || dest < 1 || dest > NUM_POINTS) {
         return 0;
     }
     int dist = abs(src - dest);
@@ -411,7 +415,7 @@ int main() {
     int playerWon;
     int maxTop, maxBottom;
     int src, dest;
-    int playerWPoints = 500, playerBPoints = 500;
+    int playerWPoints = START_SCORE, playerBPoints = START_SCORE;
     int wager;
     while (playerWPoints && playerBPoints) {
         if (playerBPoints < 10 && playerBPoints < playerWPoints) {
