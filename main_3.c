@@ -312,19 +312,20 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
     return 1;
 }
 
-/*int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
+int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
     int possibleMoves = 0;
     int i = 0;
     if (player == 'A') {
         if (hitW) {
-            if (checkLegalMove(board, 0, 24 - dices[0] + 1, player, dices, hitW, hitB)) {
+            if (checkLegalMove(board, 0, NUM_POINTS - dices[0] + 1, player, dices, hitW, hitB)) {
                 return 1;
             }
-            if (checkLegalMove(board, 0, 24 - dices[1] + 1, player, dices, hitW, hitB)) {
+            if (checkLegalMove(board, 0, NUM_POINTS - dices[1] + 1, player, dices, hitW, hitB)) {
                 return 1;
             }
+            return 0;
         }
-        for (i = 1; i <= 24; i++) {
+        for (i = 1; i <= NUM_POINTS; i++) {
             if (board[i].color == 'A') {
                 if (checkLegalMove(board, i, i - dices[0], player, dices, hitW, hitB)) {
                     return 1;
@@ -342,8 +343,9 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
             if (checkLegalMove(board, 0, dices[1], player, dices, hitW, hitB)) {
                 return 1;
             }
+            return 0;
         }
-        for (i = 1; i <= 24; i++) {
+        for (i = 1; i <= NUM_POINTS; i++) {
             if (board[i].color == 'N') {
                 if (checkLegalMove(board, i, i + dices[0], player, dices, hitW, hitB)) {
                     return 1;
@@ -355,7 +357,7 @@ int checkLegalMove (Point board[], int src, int dest, char player, int dices[2],
         }
     }
     return 0;
-}*/
+}
 
 void diceRoll (int *moves, int dices[2]) {
     dices[0] = (rand() % 6) + 1;
@@ -425,12 +427,11 @@ int main() {
         } else if (playerWPoints < 10) {
             wager = playerWPoints;
         } else {
-            printf("How many points do you want to wager?(minimum 10)\n\nWhite has %d points\nBlack has %d points\n", playerWPoints, playerBPoints);
             do {
+                printf("How many points do you want to wager?(minimum 10)\n\nWhite has %d points\nBlack has %d points\n", playerWPoints, playerBPoints);
                 scanf("%d", &wager);
-            } while (wager < 10 && wager <= playerBPoints && wager <= playerWPoints);
+            } while (wager < 10 || (wager > playerBPoints || wager > playerWPoints));
         }
-
         while (dices[0] == dices[1]) {
             printf ("Dice roll (press Enter) :\n");
             scanf ("%c", &key);
