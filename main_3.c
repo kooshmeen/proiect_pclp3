@@ -458,11 +458,12 @@ int main() {
             scanf("%c", &key);
             diceRoll(&moves, dices);
             printf("You rolled: %d %d\n", dices[0], dices[1]);
-            /*if (!anyMoves(board, player, dices, hitW, hitB)) {
-                printf("No legal moves available.");
-                moves = 0;
-            }*/
+            
             while (moves) {
+                if (!anyMoves(board, player, dices, hitW, hitB)) {
+                    printf("No legal moves available.");
+                    moves = 0;
+                }
                 maxTop = getMaxTop(board);
                 maxBottom = getMaxBottom(board);
                 printBoard(board, maxTop, maxBottom, hitW, hitB);
@@ -474,7 +475,12 @@ int main() {
                     makeMove(board, src, dest, player, dices, &hitW, &hitB);
                 } else {
                     printf("Illegal move. Try again\n");
-                    printf("You rolled: %d %d\n", dices[0], dices[1]);
+                    printf("You rolled: %d %d", dices[0], dices[1]);
+                    if (player == 'A') {
+                        printf("(White)\n");
+                    } else {
+                        printf("(Black)\n");
+                    }
                     moves++;
                 }
                 moves--;
