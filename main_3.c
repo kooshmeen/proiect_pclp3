@@ -16,6 +16,7 @@ void initializeBoard(Point board[]) {
         board[i].size = 0;
         board[i].color = ' ';
     }
+
     board[13].size = 5;
     board[13].color = 'A';
     board[12].size = 5;
@@ -32,6 +33,14 @@ void initializeBoard(Point board[]) {
     board[24].color = 'A';
     board[1].size = 2;
     board[1].color = 'N';
+
+    /*
+    //demo
+    board[19].size = 2;
+    board[19].color = 'N';
+    board[6].size = 2;
+    board[6].color = 'A';
+    */
 }
 
 void printBoard(Point tabla[], int maxTop, int maxBottom, int hitW, int hitB) {
@@ -78,11 +87,13 @@ void printBoard(Point tabla[], int maxTop, int maxBottom, int hitW, int hitB) {
 }
 
 void makeMove (Point board[], int src, int dest, char player, int dices[2], int *hitW, int *hitB) {
-    if ((dices[0] != 0) && (dices[1] != 0)  && (dices[0] != dices[1])) { // 2 zaruri diferite, folosim 1, il scoatem
-        if (abs(src - dest) == dices[0]) { // daca sunt zaruri identice nu cont ptc deja e limitat de moves
-            dices[0] = 0;
-        } else {
-            dices[1] = 0;
+    if(src != 0 && dest != 0) { //modificat aici, de verificat
+        if ((dices[0] != 0) && (dices[1] != 0)  && (dices[0] != dices[1])) { // 2 zaruri diferite, folosim 1, il scoatem
+            if (abs(src - dest) == dices[0]) { // daca sunt zaruri identice nu cont ptc deja e limitat de moves
+                dices[0] = 0;
+            } else {
+                dices[1] = 0;
+            }
         }
     }
     if(src == -1 && dest == -1) {
@@ -91,6 +102,11 @@ void makeMove (Point board[], int src, int dest, char player, int dices[2], int 
     }
     if(src == 0) {
         if(player == 'A' && hitW != 0) {
+            if(25 - dest == dices[0])
+                dices[0] = 0;
+            else
+                dices[1] = 0;
+            //si aici de verificat
             *hitW = *hitW - 1;
             //daca nu e nicio piesa
             if(board[dest].size == 0) {
@@ -110,6 +126,11 @@ void makeMove (Point board[], int src, int dest, char player, int dices[2], int 
             }
         }
         else if(player == 'N' && hitB != 0) {
+            if(dest == dices[0])
+                dices[0] = 0;
+            else
+                dices[1] = 0;
+            //si aici de modificat
             *hitB = *hitB - 1;
             //daca nu e nicio piesa
             if(board[dest].size == 0) {
@@ -133,6 +154,19 @@ void makeMove (Point board[], int src, int dest, char player, int dices[2], int 
 
     board[src].size--;
     if (dest == 0) {
+        //modificat si aici
+        if(player == 'A') {
+            if(src <= dices[0])
+                dices[0] = 0;
+            else
+                dices[1] = 0;
+        }
+        else {
+            if(25 - src <= dices[0])
+                dices[0] = 0;
+            else
+                dices[1] = 0;
+        }
         return;
     }
     if(board[src].size == 0)
@@ -330,7 +364,13 @@ int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
                 if (checkLegalMove(board, i, i - dices[0], player, dices, hitW, hitB)) {
                     return 1;
                 }
+                if (checkLegalMove(board, i, 0, player, dices, hitW, hitB)) {
+                    return 1;
+                }
                 if (checkLegalMove(board, i, i - dices[1], player, dices, hitW, hitB)) {
+                    return 1;
+                }
+                if (checkLegalMove(board, i, 0, player, dices, hitW, hitB)) {
                     return 1;
                 }
             }
@@ -350,7 +390,13 @@ int anyMoves (Point board[], char player, int dices[2], int hitW, int hitB) {
                 if (checkLegalMove(board, i, i + dices[0], player, dices, hitW, hitB)) {
                     return 1;
                 }
+                if (checkLegalMove(board, i, 0, player, dices, hitW, hitB)) {
+                    return 1;
+                }
                 if (checkLegalMove(board, i, i + dices[1], player, dices, hitW, hitB)) {
+                    return 1;
+                }
+                if (checkLegalMove(board, i, 0, player, dices, hitW, hitB)) {
                     return 1;
                 }
             }
@@ -458,10 +504,10 @@ int main() {
             scanf("%c", &key);
             diceRoll(&moves, dices);
             printf("You rolled: %d %d\n", dices[0], dices[1]);
-            
-            while (moves) {
+
+            while (moves > 0) {
                 if (!anyMoves(board, player, dices, hitW, hitB)) {
-                    printf("No legal moves available.");
+                    printf("No legal moves available.\n");
                     moves = 0;
                 }
                 maxTop = getMaxTop(board);
